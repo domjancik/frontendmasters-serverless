@@ -55,3 +55,64 @@
 </style>
 
 <h1>Movies, Floofed</h1>
+
+<div class="movies"></div>
+
+<template id="movie-template">
+  <div class="movie">
+    <img src="" alt="" />
+    <h2 class="title"></h2>
+    <p class="tagline"></p>
+
+    <h3>View ratings</h3>
+    <ul class="scores"></ul>
+  </div>
+</template>
+
+<script>
+  const addScores = (element, scores) => {
+    const list = element.querySelector(".scores");
+
+    scores.forEach((score) => {
+      const item = document.createElement("li");
+
+      const label = document.createElement("span");
+      label.classList.add("source");
+      label.innerText = score.Source.replace("Internet Movie Database", "IMDb");
+
+      const value = document.createElement("span");
+      value.innerText = score.Value;
+
+      item.appendChild(label);
+      item.appendChild(value);
+
+      list.appendChild(item);
+    });
+  };
+
+  const initialize = async () => {
+    const movies = await fetch("/.netlify/functions/movies").then((response) =>
+      response.json()
+    );
+
+    const container = document.querySelector(".movies");
+    const template = document.querySelector("#movie-template");
+
+    movies.forEach((movie) => {
+      const element = template.content.cloneNode(true);
+
+      const img = element.querySelector("img");
+      img.src = movie.poster;
+      img.alt = movie.title;
+
+      element.querySelector(".title").innerText = movie.title;
+      element.querySelector(".tagline").innerText = movie.tagline;
+
+      addScores(element, movie.scores);
+
+      container.appendChild(element);
+    });
+  };
+
+  initialize();
+</script>
